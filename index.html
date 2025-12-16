@@ -1,221 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Chimpanzee Social Behavior Dashboard</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <title>Chimpanzee Behavioral Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+    }
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f9;
-  padding: 20px;
-}
+    h1 {
+      margin-bottom: 10px;
+    }
 
-h1 { margin-bottom: 20px; }
+    /* Cards */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
 
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 15px;
-  margin-bottom: 30px;
-}
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
 
-.card {
-  background: white;
-  padding: 18px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-}
+    .card h3 {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
 
-.card p {
-  font-size: 26px;
-  font-weight: bold;
-  margin: 5px 0 0;
-}
+    .card p {
+      font-size: 26px;
+      font-weight: bold;
+      margin: 5px 0 0;
+    }
 
-.charts {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 25px;
-  margin-bottom: 40px;
-}
+    /* Charts */
+    .charts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
 
-.chart-box {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-}
+    .chart-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
 
-table {
-  width: 100%;
-  background: white;
-  border-collapse: collapse;
-}
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
 
-th, td {
-  padding: 8px;
-  border-bottom: 1px solid #eee;
-  font-size: 13px;
-}
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+      font-size: 14px;
+    }
 
-th { background: #f0f2f5; }
+    th {
+      background: #f0f2f5;
+    }
 
-.pagination {
-  margin-top: 15px;
-}
+    .pagination {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
 
-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #007bff;
-  color: white;
-  cursor: pointer;
-}
-</style>
+    button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 
 <body>
 
-<h1>Chimpanzee Social Behavior Dashboard</h1>
+<h1>Chimpanzee Behavioral Dashboard</h1>
 
 <!-- KPI CARDS -->
 <div class="cards">
-  <div class="card"><small>Sessions</small><p id="sessions">0</p></div>
-  <div class="card"><small>Presence Records</small><p id="presence">0</p></div>
-  <div class="card"><small>Grooming Events</small><p id="grooming">0</p></div>
-  <div class="card"><small>Contact Events</small><p id="contact">0</p></div>
-  <div class="card"><small>Arms Reach</small><p id="arms">0</p></div>
-  <div class="card"><small>Co-feeding</small><p id="feeding">0</p></div>
+  <div class="card"><h3>Total Chimps Present</h3><p id="presentCount">0</p></div>
+  <div class="card"><h3>Grooming Events</h3><p id="groomingCount">0</p></div>
+  <div class="card"><h3>Contact Events</h3><p id="contactCount">0</p></div>
+  <div class="card"><h3>Arms Reach</h3><p id="armsCount">0</p></div>
+  <div class="card"><h3>Co-feeding</h3><p id="feedingCount">0</p></div>
 </div>
 
 <!-- CHARTS -->
 <div class="charts">
-  <div class="chart-box"><canvas id="behaviorBar"></canvas></div>
-  <div class="chart-box"><canvas id="behaviorPie"></canvas></div>
-  <div class="chart-box"><canvas id="sessionLine"></canvas></div>
-  <div class="chart-box"><canvas id="topPartners"></canvas></div>
+  <div class="chart-box">
+    <canvas id="barChart"></canvas>
+  </div>
+  <div class="chart-box">
+    <canvas id="pieChart"></canvas>
+  </div>
+  <div class="chart-box">
+    <canvas id="lineChart"></canvas>
+  </div>
 </div>
 
 <!-- TABLE -->
-<h2>Raw Observation Data</h2>
+<h2>Observation Records</h2>
 <table>
-<thead>
-<tr>
-  <th>Session</th><th>Date</th><th>Chimp</th><th>Present</th>
-  <th>Grooming</th><th>Contact</th><th>Arms Reach</th><th>Co-feeding</th>
-</tr>
-</thead>
-<tbody id="tableBody"></tbody>
+  <thead>
+    <tr>
+      <th>Session</th>
+      <th>Date</th>
+      <th>Chimp</th>
+      <th>Present</th>
+      <th>Grooming</th>
+      <th>Contact</th>
+      <th>Arms Reach</th>
+      <th>Co-feeding</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
 </table>
 
 <div class="pagination">
-  <button onclick="prevPage()">Prev</button>
-  <button onclick="nextPage()">Next</button>
+  <button id="prevBtn">Prev</button>
+  <button id="nextBtn">Next</button>
 </div>
 
 <script>
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOFeFnJwXh8V9BQtaeMa6nWk76v6cZ229rLxTUzzWGqhrmurbbDpbu1Bodz2LCNE_AtkPs07wWOOmQ/pub?gid=1298553947&single=true&output=csv";
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/XXXXX/pub?output=csv";
 
-let rows = [];
-let page = 1;
-const perPage = 12;
+let dataRows = [];
+let currentPage = 1;
+const rowsPerPage = 10;
 
 fetch(SHEET_URL)
-.then(res => res.text())
-.then(csv => {
-  rows = csv.split("\n").slice(1).map(r => r.split(","));
-  analyze();
-  renderTable();
-});
+  .then(res => res.text())
+  .then(csv => {
+    const rows = csv.split("\n").slice(1);
+    rows.forEach(r => dataRows.push(r.split(",")));
+    processData();
+    renderTable();
+  });
 
-function splitPartners(cell) {
-  if (!cell) return [];
-  return cell.split(/[;,]/).map(x => x.trim()).filter(Boolean);
-}
+function processData() {
+  let present = 0, grooming = 0, contact = 0, arms = 0, feeding = 0;
+  let sessionMap = {};
 
-function analyze() {
-  let sessions = new Set();
-  let presence = 0, grooming = 0, contact = 0, arms = 0, feeding = 0;
-  let sessionCounts = {};
-  let partnerMap = {};
-
-  rows.forEach(r => {
-    const session = r[0];
-    const presentVal = r[3];
-    sessions.add(session);
-
-    if (presentVal !== "Yes") return;
-    presence++;
-
+  dataRows.forEach(r => {
+    if (r[3] === "Yes") present++;
     if (r[4] === "Yes") grooming++;
     if (r[7] === "Yes") contact++;
     if (r[10] === "Yes") arms++;
     if (r[11] === "Yes") feeding++;
 
-    sessionCounts[session] = (sessionCounts[session] || 0) +
-      (r[4] === "Yes") + (r[7] === "Yes") + (r[10] === "Yes") + (r[11] === "Yes");
-
-    [...splitPartners(r[6]), ...splitPartners(r[8]), ...splitPartners(r[9]), ...splitPartners(r[12])]
-      .forEach(p => partnerMap[p] = (partnerMap[p] || 0) + 1);
+    const session = r[0];
+    sessionMap[session] = (sessionMap[session] || 0) + (r[4] === "Yes");
   });
 
-  document.getElementById("sessions").textContent = sessions.size;
-  document.getElementById("presence").textContent = presence;
-  document.getElementById("grooming").textContent = grooming;
-  document.getElementById("contact").textContent = contact;
-  document.getElementById("arms").textContent = arms;
-  document.getElementById("feeding").textContent = feeding;
+  document.getElementById("presentCount").textContent = present;
+  document.getElementById("groomingCount").textContent = grooming;
+  document.getElementById("contactCount").textContent = contact;
+  document.getElementById("armsCount").textContent = arms;
+  document.getElementById("feedingCount").textContent = feeding;
 
-  createCharts(grooming, contact, arms, feeding, sessionCounts, partnerMap);
+  createCharts(grooming, contact, arms, feeding, sessionMap);
 }
 
-function createCharts(g, c, a, f, sessions, partners) {
-  new Chart(behaviorBar, {
+function createCharts(g, c, a, f, sessionMap) {
+  new Chart(barChart, {
     type: "bar",
-    data: { labels: ["Grooming","Contact","Arms","Feeding"],
-      datasets: [{ data: [g,c,a,f] }] }
-  });
-
-  new Chart(behaviorPie, {
-    type: "pie",
-    data: { labels: ["Grooming","Contact","Arms","Feeding"],
-      datasets: [{ data: [g,c,a,f] }] }
-  });
-
-  new Chart(sessionLine, {
-    type: "line",
     data: {
-      labels: Object.keys(sessions),
-      datasets: [{ label: "Behaviors per Session", data: Object.values(sessions) }]
+      labels: ["Grooming", "Contact", "Arms Reach", "Co-feeding"],
+      datasets: [{ data: [g, c, a, f] }]
     }
   });
 
-  const sorted = Object.entries(partners).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  new Chart(topPartners, {
-    type: "bar",
+  new Chart(pieChart, {
+    type: "pie",
     data: {
-      labels: sorted.map(x=>x[0]),
-      datasets: [{ label:"Interactions", data: sorted.map(x=>x[1]) }]
+      labels: ["Grooming", "Contact", "Arms", "Feeding"],
+      datasets: [{ data: [g, c, a, f] }]
+    }
+  });
+
+  new Chart(lineChart, {
+    type: "line",
+    data: {
+      labels: Object.keys(sessionMap),
+      datasets: [{
+        label: "Grooming per Session",
+        data: Object.values(sessionMap),
+        fill: false
+      }]
     }
   });
 }
 
 function renderTable() {
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
   tableBody.innerHTML = "";
-  rows.slice((page-1)*perPage, page*perPage).forEach(r => {
+
+  dataRows.slice(start, end).forEach(r => {
     tableBody.innerHTML += `
       <tr>
-        <td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td>
-        <td>${r[3]}</td><td>${r[4]}</td>
-        <td>${r[7]}</td><td>${r[10]}</td><td>${r[11]}</td>
+        <td>${r[0]}</td>
+        <td>${r[1]}</td>
+        <td>${r[2]}</td>
+        <td>${r[3]}</td>
+        <td>${r[4]}</td>
+        <td>${r[7]}</td>
+        <td>${r[10]}</td>
+        <td>${r[11]}</td>
       </tr>`;
   });
 }
 
-function nextPage(){ page++; renderTable(); }
-function prevPage(){ if(page>1){ page--; renderTable(); } }
+prevBtn.onclick = () => {
+  if (currentPage > 1) {
+    currentPage--;
+    renderTable();
+  }
+};
+
+nextBtn.onclick = () => {
+  if (currentPage * rowsPerPage < dataRows.length) {
+    currentPage++;
+    renderTable();
+  }
+};
 </script>
 
 </body>
